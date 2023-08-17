@@ -1,0 +1,211 @@
+---
+title: "Recalling Words"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(car)
+library(pander)
+library(DT) #You may need to run: install.packages("DT") 
+```
+
+
+<br />
+
+#### Background
+
+Many teachers and other educators are interested in understanding how to best deliver new content to students. In general, they have two choices of how to do this.
+
+1. The Meshed Approach
+    * Deliver new content while simultaneously reviewing previously understood content.
+
+2. The Before Approach
+    * Deliver new content after fully reviewing previously understood content.
+
+A study was performed to determine whether the *Meshed* or *Before* approaches to delivering content had any positive benefits on memory recall. 
+
+<div style="padding-left:15px;">
+
+##### <a href="javascript:showhide('uniquename')">The Experiment <span style="font-size:8pt;">(click to view)</span></a>
+
+
+<div id="uniquename" style="display:none;">
+
+Individuals were seated at a computer and shown a list of words. Words appeared on the screen one at a time, for two seconds each, until all words had been shown (40 total). After all words were shown, they were required to perform a few two-digit mathematical additions (like 15 + 25) for 15 seconds to avoid immediate memory recall of the words. They were then asked to write down as many of the 40 words as they could remember. They were given a maximum of 5.3 minutes to recall words.
+
+The process of showing words and recalling words was repeated four times with the same list of words each time (four chances to get it right). The presentation of the first trial was the same for all treatment conditions. However, trials 2, 3, and 4 were slightly different for each treatment condition.
+
+<div style="padding-left:15px;">
+
+The `SFR` group (the control group) stands for Standard Free Recall. In all four trials the same list of 40 words was presented, in a random order each time.
+
+The `Before` group also used the same 40 words during each trial. However, any words that were correctly recalled in a previous trial were presented first, or *before* the words that were not recalled in the last trial. After all the correct words were presented in random order, the non-recalled words were presented in a random order.
+
+The `Meshed` group also used the same 40 words during each trial. However, words that were correctly recalled in a previous trial were alternated with a missed word during the next presentation order. 
+
+</div>
+
+The data records the number of correctly recalled words (out of the 40 possible) from the fourth trial. Results were obtained for 30 students, 10 in each of the three treatment groups: `SFR`, `Before`, and `Meshed`. 
+
+</div>
+
+##### <a href="javascript:showhide('uniquename2')">The Data <span style="font-size:8pt;">(click to view)</span></a>
+
+<div id="uniquename2" style="display:none;">
+
+The results from the study can be found in the `Friendly` data set in R after loading `library(car)`. 
+
+Click the "Code" button to see the data.
+
+
+```{r, message=FALSE, warning=FALSE}
+datatable(Friendly, options=list(lengthMenu = c(3,10,30)))
+```
+
+
+
+
+</div>
+</div>
+
+<br />
+
+
+<!-- Begin writing your analysis below here. -->
+
+<!-- Note that your goal is to use the Friendly data to show whether or not the Meshed or Before methods have any positive benefit on memory recall. -->
+
+
+```{r, eval=FALSE,message=FALSE, warning=FALSE}
+# Play the chunk above and this one to get the data into your Console
+
+
+F2<-Friendly
+
+F5<-F2 %>% filter(condition!="SFR")
+
+
+
+```
+
+## Framing The Question
+
+*Which Method of these three is the best preforming for student retention of information?*  
+
+The Question is two parted.  First, is does an active learning method offer any advantage over just doing nothing, and Second, is there a signficant difference between the active learning methods and student preformance?
+
+
+## Normality And Visualizing The Data
+
+```{r, echo=FALSE}
+boxplot (correct ~ condition, data=Friendly, boxwex=.3,
+        xlim=c(.5,3.5), col="gray", main="Learing Methods Compared", xlab="Active Learning Method", ylab="Answered Remembered Correctly")
+stripchart(correct ~ condition, data=Friendly, method="stack", 
+           vertical=TRUE, pch=16, col="steelblue4", cex=1.25,
+           add=TRUE)
+```
+
+The actual summary values depicted in the plot above are shown in the following table.
+
+```{r}
+Friendly %>%
+  group_by(condition) %>%
+  summarise(min = min(correct), median = median(correct), mean = mean(correct), max = max(correct), sd = sd(correct), `Number of Students` = n()) %>%
+pander(caption="Summary Of Results")
+```
+
+This Gives Us Some Numbers to explain what's happening in the Data.  The "vitals" of each approach if you would.  Things like the exact median value which allows us to percisly see the difference in the data, and the range of the test results.
+
+
+
+```{r}
+
+qqnorm(Friendly$correct)
+qqline(Friendly$correct)
+
+```
+
+As can be seen in the qqPlot the data is not normally distrbuted as it doesnt follow the patern the data points would suggest exisit from its distribution.
+Further in the graphs, The Data is not normally distrubted around be mean with clusters on either side and outliers skewing it, further, we can see that the sample size (or total number of people in each sample) is less than 30 meaning it doesnt satisfy the requirements of a T test.  However we can use a wilcox test.  
+
+
+
+## Hypothosis
+
+Because a the data is too adnormally distrbuted for a T test we have to use a Wilcox test.  Which uses the Median of a sample rather and a mean, meaning it can be satisifed with much smaller populations and still come closer to finding the true median than an average from such a small population would.  It would be even better to have an itaritive approach.
+
+Formally, the null and alternative hypotheses are written as
+$$
+  H_0: \text{difference in medians} = 0
+$$
+
+$$
+  H_a: \text{difference in medians} \neq 0
+$$
+
+The significance level for this study will be set at
+$$
+  \alpha = 0.05
+$$
+Meaning, an P value that comes back lower than .05 would indicate the difference in the data is signficant.  
+
+## The Active Methods Compared
+
+
+```{r, message=FALSE, warning=FALSE}
+
+stripchart(Friendly$correct~Friendly$condition, method="stack", xlab="Number Remembered Accurately of 40", main="Which Learning Method is the Best", ylab="Learning Method")
+
+```
+
+As seen above the control or SFR were no active learning method was used has by far the lowest preformance meaning, that both active methods acutally contribute to some degree of improved retention of information.
+
+However the test I wish to preform is if there is a difference between the two "active" methods.  Meaninga test between the Medians of the Before and the Meshed Approach.  
+
+Thankfully the control Group is the lowest of the three (meaning these other methods accutally are helping students improve their preformance) Which leaves the question, which of the Meshed and Before is the better method.  Since a mean comparision is maybe unussable from the data sizes being too small in the first place.  We are left with a Wilcox Test.  
+
+The test used here will have to be to determine if there is any difference between the two 
+
+## Wilcox Test
+
+```{r, message=FALSE, warning=FALSE}
+
+pander(
+wilcox.test( correct ~ condition, data=F5, mu=0, alternative="two.sided" , confidence=0.95)
+)
+```
+
+As seen above the P value for the test of the difference of Medians between the Meshed Approach and the Before of no learning method is lower than the Alpha of 0.05  
+
+This means that we fail to reject the null of there being no difference between the median value of the two learning methods and thus a difference exisits between the scores of the one learning method group and the Before Learning method group.
+
+## Conclusion
+
+With a P value well over .05 (coming in at .378) we can safely say we fail to reject the null hypthosis.  Meaning there is little significant difference between the medians of the two active learning methods.  While one has a high over all clustering perfect scores, the other has a higher overal score.  Both offer merit.
+
+There is the arugemnt, that if everyone were to adopt the before approach it would have an full perfect scores.  The idea being the meshed approach revisits material frequently and offers the benifit of repetition increasing retention, however there also is the chance of those that never both to learn on their own having the information repeated to them.  The point being, the lower number of perfect scores and even decent scores for the Before approach could simiple be because some didnt both to learn on their own at all and relied only on the first and only time it was taught in a class room setting to remeber it by.  The idea being that the "before" approach may not have reviewed the material at all on their own.  That said, this is still an unknown.
+
+Further.  The benifit or repetition is to be noted.  That said the "its all on you to remember all this approach" could lead to those higher number of perfect scores.  
+
+In simipler terms, although the clustering of higher preforming students was all on or near a perfect score with the before approach, it also had the lowest scores of the two.  Where as the Meshed version while not with the most high scores appears to have the greatest average score.  The issue becomes there is too little data to determine with confidence if the differences between before and meshed are freak outlier or if that would be consistent with repetitions of the study.  An aruguement can exisit in favor of either Method.  One seems to create more "exceling" students, and the other a high quanitiy of "realtiviyl high preforming" students.
+
+While many other factors exisit to be tested for example.  Such as perhaps a techinques used by the individuals in the test or any number of other factors. A larger sample size would be recommened in the future to help by hope of the viture of larger sample size account for any specail single circumstance.  Even then other matters exisit.  But if it were to be used over time and conducted repeatedly parterns could begin to develop again, that said.  This does not preclude that there is not more out there, perhaps a technique not tried yet, or a group of people that have developed characitsitcs or ablilities that would render this teaching method unnecesary. But such a instance would appear as a case when the SFR would be greater.  Still, good to know educations helps us learn information better.  That said, true education will always be in teaching a man to think and not what to think.
+
+
+
+
+
+
+
+

@@ -1,0 +1,135 @@
+---
+title: "High School Seniors t Test"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(DT)
+library(pander)
+library(readr)
+library(car)
+library(dplyr)
+library(mosaic)
+HSS <- read_csv("../../Data/HighSchoolSeniors.csv")
+
+```
+
+
+```{r}
+HSS <- HSS %>%
+  mutate(recycling_than_water = ifelse(Importance_recycling_rubbish >	Importance_conserving_water, "Recycling More Important", "Water Conservation More Important"))
+  
+
+  
+```
+
+I considered there might be grounds for a difference to exisit between travel times to school in different states.  As I wasnt sure if this was the case I determined to us a T test to explore the difference in the mean of the travel to school from two different states.  As I am comparing two different samples against one another a T Test would be appropriate.  In order for a T Test's assumptions to be satisifed I need to have two samples sizes of atleast 30 to satisify the central limit therom.
+
+
+To that end I picked the two most populus states in the US, Califronia and Texas, in an effort to have the greatest likeilhood of their samples being large enough to prefrom this test.  The number of responses from California was 82 and the number from Texas was 60, both well above the minimum requirements of the central limit theorm to make the data usable for a T test.
+
+Should an individual test for normality using a QQ plot first as an intial test of normality.
+
+
+## Hypthosis
+
+Formally, the null and alternative hypotheses are written as
+$$
+  H_0: \mu_\text{Student Travel In California} - \mu_\text{Student Travel Time in Texas} = 0
+$$
+
+$$
+  H_a: \mu_\text{Student Travel In California} - \mu_\text{Student Travel Time in Texas} \neq 0
+$$
+
+The significance level for this study will be set at
+$$
+  \alpha = 0.05
+$$
+
+
+```{r}
+
+HSSF<-filter(HSS, Region == "CA")
+HSSG<-filter(HSS, Region == "TX")
+HSST<-HSS %>% filter(Region=="CA" | Region=="TX")
+
+boxplot(HSST$Travel_time_to_School~ HSST$Region, col=c("blue", "red"), xlab="States", ylab="Travel Time To School in Minutes", main="Califronia Vs. Texas")
+
+
+#boxplot(HSSG$Travel_time_to_School, HSSF$Travel_time_to_School, col=c("red", "blue"), xlab="States", ylab="Travel Time To School in Minutes")
+
+```
+
+For Reference the Blue Box Plot is data from California and the Red Box Plot is the data from Texas.
+
+As you can see in the above Box Plots the Means of both data set while not identical have a almost identical mean even though there is a striking difference in the variation of each.
+While California has the larger variton in its travel times as outliers it doesnt seem to be effecting the sample's mean significantly.  
+
+## Normality of the Populations
+
+```{r}
+#qqPlot(HSS$Travel_time_to_School, xlab="Texas Students", ylab="Travel Time In Minutes", main="Normality of US Student Travel Time")
+
+qqPlot(HSSG$Travel_time_to_School, xlab="Texas Students", ylab="Travel Time In Minutes", main="Texas Normality",id=FALSE)
+
+qqPlot(HSSF$Travel_time_to_School, xlab="California Students", ylab="Travel Time In Minutes", main="California Noramlity",id=FALSE)
+
+HSST<-HSS %>% filter(Region=="CA" | Region=="TX")
+
+#qqPlot(HSST$Travel_time_to_School, ylab="Travel Time In Minutes", main="Satistical Normality of Texas and California Travel Times", id=FALSE)
+
+```
+
+
+As you can see from above.  The Texas Data is Normally Distrubted but the QQ plot for the California data seems irregular, Having a curve instead of the expected straight line indicating a normal distribution. This is due to some massive increases towards the upper end.  However the samples sizes for both are well over 30 ensuring an approximately normal distribtution as shown by the central limit therom, meaning any T test we preform has its assumptions satisified.  Which means we can safely preform a T test.
+
+
+## T Test
+
+```{r}
+
+pander( t.test(HSSG$Travel_time_to_School, HSSF$Travel_time_to_School))
+
+
+```
+
+The Null Hypothesis, there is that there is no signifcant difference between the travel times to school in Texas, as there is in California.
+To test this with a level of 95% confidence the T test was preformed.  
+
+As shown above.  The Alpha value for a test of .95 significance (a reasonable level of confidence as there is nothing life threating in the variations).  The Alpha value for a test of significance of this level would need to be below .05  As seen above. The alpha (p value) is just above .05, at .054. meaning that we fail to reject the null hypothesis stating there is no significant difference between the mean time it takes to go to school in Texas or Califonia. 
+
+```{r}
+#CADF<-data.frame(HSSF$Region,HSSF$Travel_time_to_School) 
+
+#Test<-group_by(HSST,Region)
+
+#Test<-select(Test, "Travel_time_to_School")
+
+#Test %>% group_by(Region) %>% table() %>% pander()
+
+pander(summary(HSST$Travel_time_to_School), caption="Texas Travel Times")
+
+pander(summary(HSSG$Travel_time_to_School), caption="California Travel Times")
+
+```
+
+
+## Conclusion
+
+Not having sufficent evidence to reject the null Hypthosis, or in others words having found there is no significant difference in average travel time between the two states.
+
+
+Means on average the time it takes for most seniors to get to school is the same in either state.  Now there are California numbers that are much larger.  Which is surprising as one might consider a state as large geographically large as texas to have more of it students traveling from location outside the average range.  There could be a respondant basis that only those closest to responded.  
+
+Considering there to be more ranches and other far flung homesteads.  But it could be that in California there are more students enrolling in a school signifcantly far way from their home for the programs offered or a desire to go to school somewhere else.
+
+Regardless the departments of education of both schools can reset assurded that in the case of this data students are having a the same amount of time (generally speaking) in how long it takes them to get to school.
+
+
+-->
+

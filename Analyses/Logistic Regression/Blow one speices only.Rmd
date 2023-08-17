@@ -1,0 +1,142 @@
+---
+title: "The Sound of Two Trees in the Forest"
+output: 
+  html_document: 
+    theme: cerulean
+    code_folding: hide
+---
+
+<hr />
+
+#### Background
+
+Trees Fall Over in storms, The point of this is to test which trees fall over and if there is one that is more likely to fall over than another.
+
+In the data set.  The Trees Diameter was Recorded, if the tree died, and the tree type.
+The Tree Types in this Data Set are Aspen and Paper Birch.
+
+```{r, include=FALSE}
+library(alr3)
+library(mosaic)
+library(DT)
+library(dplyr)
+```
+
+```{r}
+datatable(blowAPB)
+```
+
+<br />
+
+#### Logistic Model
+
+To model the probability of the a tree falling at diameters, we could apply the logistic regression model
+$$
+  P(Y_i = 1|x_i) = \frac{e^{\beta_0+\beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} = \pi_i
+$$
+where for observation $i$: 
+
+* $Y_i = 1$ denotes the tree dying, 
+* $Y_i=0$ denotes the tree not dying, and 
+* $x_i$ denotes the diameter of the tree. 
+
+Note that if $\beta_1$ is zero in the above model, then $x_i$ (diameter) provides no insight about the probability of a tree dying. Thus, we could test the hypothesis that
+
+$$
+  H_0: \beta_1 = 0 \\
+  H_a: \beta_1 \neq 0
+$$
+
+<br />
+
+
+#### Exploring The Data
+
+```{r}
+
+blowAPB2 %>% group_by(SPP) %>% summarize(samplesize=n()) %>% pander()
+
+```
+
+As The Data Shows there are only two types of Tree Record in this Dataset.
+Tree type Aspen and Treee type Pine Birch.  And there are roughly the same number of each in the area studied, however to avoid this perhaps simiply being a test of if one tree is more liekly to fall than the other we will look only at Pine Birchs likelihood of falling.
+
+```{r}
+treeD<-blowAPB %>% filter(SPP=="PB")
+```
+
+
+
+#### Fitting the Model
+
+To obtain estimates of the coefficients $\beta_0$ and $\beta_1$ for the `blowAPB` data, we apply the following R code.
+
+```{r}
+blow.glm2 <- glm(y>0 ~ D, data=treeD, family=binomial)
+summary(blow.glm2)
+b2<-coefficients(blow.glm2)
+```
+
+Thus the estimated model for $\pi_i$ is given by
+$$
+  P(Y_i = 1|x_i) \approx \frac{e^{-2.280+0.1094 x_i}}{1+e^{-2.280+0.1094 x_i}} = \hat{\pi}_i
+$$
+where $b_0 = -2.280$ is the value of the `(Intercept)` which estimates $\beta_0$ and $b_1 = 0.1094$ is the value of `Diameter` which estimates $\beta_1$.
+
+Importantly, the $p$-value for the test of `Diameter` shows a significant result $(p = 0.0320)$ giving sufficient evidence to conclude that $\beta_1 \neq 0$, which allows us to conclude that Diameter effects the probability of an A Tree falling.
+
+<br />
+
+#### Visualizing the Model
+
+To visualize this simple logistic regression we could make the following plot.
+
+```{r}
+plot( y>0 ~ D, data=treeD, main="", ylab='Probability of Tree Dying', xlab="Tree Diameter in cm)", pch=16)
+curve(exp(b2[1]-b2[2]*x)/(1-exp(b2[1]-b2[2]*x)), from=1, to=60, add=TRUE)
+```
+
+<br />
+
+#### Diagnosing the Model
+
+To demonstrate if the logistic regression is a good fit to this data we apply the Hosmer-Lemeshow goodness of fit test (since there are only a couple repeated $x$-values) from the `library(ResourceSelection)`. 
+
+```{r, warning=FALSE, message=FALSE}
+library(ResourceSelection)
+```
+```{r}
+hoslem.test(blow.glm2$y, blow.glm2$fitted, g=6)
+# Note: doesn't give a p-value for g >= 7, default is g=10.
+# Larger g is usually better than smaller g.
+```
+
+Recall that the null hypothesis is that the logistic regression is a good fit for the data, thus we reject the null, and claim that the logistic regression is not appropraite to predict this phenomina.
+
+<br />
+
+#### Conclusion
+
+Since there is not a stable model, with tree diameter not being a prediction of falling over.  THere are other factors at place this model does not take into account, such as age of the tree, if it were infected, or already damaged, even its position in the forest. Thus unfortanetly this model cannot predict the lieklyood of a tree based on its diameter alone, as it does not have a group of like data.
+
+Or it could be simiply saying that it doesnt matter how thick the trees are, they are always going fall over if they fall over. If there is something that will predict which trees will fall its not the diameter alone.
+
+To be Fair this is a mixed data set so perhaps just one tree is more resilant than another.
+
+They seem just alittle more likely at the very small stages.
+
+It also could be saying that after a certian point, there really isnt alot that predicts wither or not the tree falls.  
+
+Since the temperature being zero is not really realistic for this model, the value of $e^{b_0}$ is not interpretable. However, the value of $e^{b_1} = e^{-0.232} \approx 0.79$ shows that the odds of the o-rings failing for a given launch decreases by a factor of 0.79 for every 1&deg; F increase in temperature. (Note that this implies that every 1&deg; F decrease in temperature increases the odds of a failed o-ring by a factor of $e^{0.232} \approx 1.26$.) The Challenger shuttle was launched at a tempurature of 31&deg; F. By waiting until 53&deg; F, the odds of failure would have been decreased by a factor of $e^{-0.232(53-31)}\approx 0.006$. Note that for a temperature of 31&deg; F our model puts the probability of a failure at
+$$
+  P(Y_i = 1|x_i) \approx \frac{e^{15.043-0.232\cdot 31}}{1+e^{15.043 - 0.232 \cdot 31}} = \hat{\pi}_i
+$$
+which, using R to do this calculation we get $\hat{\pi_i} \approx$
+```{r}
+predict(chall.glm, data.frame(Temp=31), type='response')
+```
+
+
+```{r}
+predict(chall.glm, data.frame(Temp=70.7), type='response')
+```

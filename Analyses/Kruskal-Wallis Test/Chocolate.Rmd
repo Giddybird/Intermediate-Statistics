@@ -1,0 +1,234 @@
+---
+title: "Chocolate"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+# Be sure to use your file menus at the top of R-Studio to:
+# "Session -> Set working directory -> To source file location"
+# Then play this chunk and the next one to get the data into R.
+library(mosaic)
+library(car)
+library(DT)
+library(pander)
+library(readr)
+choc <- read_csv("../../Data/Chocolate.csv")
+```
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+
+
+
+
+
+#need to combine domonincan republc and the mispelling. Or I can ignore it b
+
+
+
+##summarise(n()) = summarise the number.
+
+choc<-droplevels(filter(choc, BroadOrig!="��")
+
+
+## find groups.  Cocoa percntage, rating. compated between groups.  
+
+#use or statements
+#
+# ?kruskal.test (#number, group data=data)
+#choosing three differnt years. or origin.  
+#ranking system. and the data will not be normal.. (graph of data to show that its skewed) compares the medians not the means.  
+```
+
+## Background
+
+**Chocolate! Who Doesnt Love Chocolate!**
+
+Growing up near Hershey Pennsylviania I had the oppurtunity to be familiar with the chocolate making process whenever my family visited to keep 7 active kids busy for a few hours.  Coco is an essential ingredient in the making of Chocolate.  But, what many dont know is where it comes from.  Coco only grows in tropical climates.  It is accutally a bean contained inside a bigger fruit.  The percentage of Coca in the fruit is an import factor in the chocolate making process.  To that end I set out to determine if a signicant difference exisits between the broad reigions of South and Central American in the percentage of Cocao in each beans or if they are more less the same.  Before I could choose a test to use I had to first an analysis of normality of the data.
+
+Before I start comparing countries, I want to know what the data looks like first.  I will pick the countries being compared then.  
+
+
+## Test For Normality Of Data
+
+As seen above in the QQ plot of the entire data set.  The data of the Cocao percentages is well outside the line of best fit meaning the data in question is not normally distrubted.  Thus calling for a test that can be used on non normally distributed data. Enter the Kruskal Wallace Test, a test using medians of two or more samples.
+
+```{r, message=FALSE, warning=FALSE}
+choc$Cocao <- as.numeric(gsub("%","",choc$Cocao))
+
+Chocaov<-aov(Cocao~BroadOrig, data=choc)
+  par(mfrow=c(1,2))
+plot(Chocaov, which=1:2, pch=16)
+```
+
+
+
+
+
+
+## Hypthosis of the Kruskal Wallace Test
+
+
+$$
+  H_0: \text{All samples represent a sample of data from the same distribution.}
+$$ 
+
+$$
+  H_a: \text{At least one distribution is stochastically different than the others.}
+$$
+
+Essentially.  The Kruskal Wallace Test compares the Median of the data sets looking for one to be sufficently different than the others.  Or in otherwords one to have stostchially different value. As the median allows for a reasonably accurate test of variance to still be preformed using data that even when it is not normally distributed.  
+In other Words the Null Hypthosis for this Test is "There is no signifcant difference between the medians of the groups in question".  And the alterntavie being "there is significant difference in atleast one of the groups."
+
+We are using a 95% Confidence interval meaning in order for the test to be signficant the P below our alpha of .05
+
+
+Now before the test can begin.  A few things need to happen.  First off it is increbily difficult to identify which variable is the one being significnat simiple using a Test of Variance like ANOVA or the Kruskal Wallace Test, if We are using all the samples included.  When one is testing from among 200 samples its diffuclt to tell which of those 200 and how many are different this test appears to operate best when it is being used among a smaller collection of samples. Both of these tests do not provide the information of which is different just THAT one of them is.
+
+
+In mind it seems more effective to pick those that could be reasonablly compared otherwise.  Ideally one with a large sample size though this test is not dependant on having large sample sizes, in deed is the test used when samples are not large enough traditionall. However good practice for comparibilty in other tests has created a habit in me of trying to find similar sized samples whenever possible.  Similar in size does not mean similalry comparable however it is more habit I have fallen into. 
+
+Many other factors exisit in creating a comparision but the purpose of this is to determine if a signifcant difference exisits between the quality of the Cocao from among several points of Origin of similar size.   The size is mostly for reasonable comparision.  To know that the sample sizes were roughly the same though again this test is largely uneffected by sample sizes over the base point.
+
+To pick the samples to be used a comparison of size was my approach.  To look for identify samples of similar sizes a summarize command was sufficent.
+
+
+## Table of the Sample Sizes
+
+```{r, message=FALSE, warning=FALSE}
+
+choc %>% group_by(BroadOrig) %>% summarise(DataPoints=n()) %>% filter(DataPoints >20)
+
+
+#how can pander this?^
+
+```
+A note here, the pander function for doesnt like the special characters and Brother Amidan and I havent been able to find what those characters are. He gave me a pass on this one.  It works this way.  But I appreciate your feedback I will be sure to make sure that happens in all future cases. 
+
+From the summary we can see that the countries of Belize, Bolivia and Brazil are all reasonable comparable. When looking at the large sample sizes of the Domican Republic two issue exist.  First. a recording error in the data has created two seperate entries for the Domincan republic which could be fixed but the scope could still be accomplished through a different means. A test of different samples can still be done. Although it was not neccessary I picked three similarly sized samples, a practice of wanting similarlly sized samples which is unnecssary with this test yes, but the practice is one I intend to stay in the habit of whenever possible. 
+
+These countries had the added benifit of being from the same hemisphere of the world however, they also represent various regions from within that hemisphere.
+Furhter it Behooves us to test to visualize the medians in question.
+
+
+```{r, message=FALSE, warning=FALSE}
+choc2<-choc %>% filter(BroadOrig %in% c("Bolivia","Brazil","Belize"))
+boxplot(Cocao ~ as.character(BroadOrig), data=choc2, type=c("p","a"), col='grey', ylab="Cocao Percentage", main="Cocao By Region")
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+
+kruskal.test(choc2$Cocao, choc2$BroadOrig, data=choc2) %>% pander()
+
+```
+The above test shows there is no signifcant difference in the amount of Cocao among the broad groups of Bolivia, Brazil, and Belize.  The P value being so high, well above even a 90% confidence internal meaning the these three regions with even one being sligtly more north in the central America, had no significant differnce in the Cocao quantities.
+
+Here the P value of .1703.  As this test is looking for a 95% confidence interval, meaning only P values lower than .05 will make test significant.  As the P value was .1703, it is clear the data is not significant in the way we are looking at it.
+
+We have insufficent evidence to reject the Null Hypthosis that the Median Cocao percantage differences between these groups.
+
+Or in other words. There is insufficent evidence to suggest these data sets are stoatically different from one another.
+
+**A break down of the samples can be seen below**
+
+```{r, message=FALSE, warning=FALSE}
+pander(favstats(Cocao ~ BroadOrig, data=choc2)[,-10])
+```
+
+To futher solidfy this it is worth while to take a look at histograms of the data. The Cocao percentages of each Broad region of Origin was graphed.  As seen below.  Note: the A axis on each.  Though the varition of each graph is unique the most common outcome is always around the 70% mark of Cocao.
+
+
+```{r, message=FALSE, warning=FALSE}
+
+#filtering data
+choc4<-choc %>% filter(BroadOrig %in% c("Bolivia"))
+choc5<-choc %>% filter(BroadOrig %in% c("Brazil"))
+choc6<-choc %>% filter(BroadOrig %in% c("Belize"))
+
+hist(choc4$Cocao, breaks=15, col='red', xlab="Cocao Percentage", main="Bolivia")
+```
+
+In Boliva to most common result is about 70% Cocao with about 20 cases, making the median squarly in the region.
+
+```{r, message=FALSE, warning=FALSE}
+hist(choc5$Cocao, breaks=15, col='red', xlab="Cocao Percentage", main="Brazil")
+
+```
+
+In Brazil it again is about 70% and again roughly roughly 20 cases
+
+```{r, message=FALSE, warning=FALSE}
+hist(choc6$Cocao, breaks=15, col='red', xlab="Cocao Percentage", main="Belize")
+```
+
+And finally in Belize its the same story with about 15 cases.
+
+The overall tread is shown again in this graph of all three shown together
+
+```{r, message=FALSE, warning=FALSE}
+hist(choc2$Cocao, breaks=15, col='red', xlab="Broad Origin", main="Cocao percentages in 3 Regions compared")
+```
+
+This shows that of all the three regions taken together the most frequent Cocao percentage is just under 70% even when all three reigions are taken together.  Meaning that in these reigions there is little signifcant difference in the percentage of Cocao.
+
+This supports the Null Hypthosis of the Kruskal Wallice test that "There is no significant difference between the medians of the groups in question".
+
+## Conclusion
+
+
+There is insufficent evidence to suggest that atleast on sample is signifcantly different form among the samples used in regards to the percentage of Cocao in the exports from the Broad regions of origin of Boliva, Brazil, and Belize.  Perhaps a finer toothed comb or more focused study could reveal if a more specific differance exisits at a smaller level, perhaps a specific region of Boliva Brazil or Belize produces a higher or lower quality product with lower or high amounts of Cocao.  However from this test it can be concluded that on the whole there is no signicant differnece among the quality of Cocao from these reigions.  
+
+
+----
+
+<!-- Instructions:
+
+ Use the Chocolate dataset and a Kruskal-Wallis Test(s) to answer an interesting question(s) that you come up with.
+ 
+ About the dataset:
+ 
+  * Company: Name of the company manufacturing the bar.
+
+  * Orig: The specific geo-region of origin for the bar.
+
+  * Review: Date of publication of the review.
+
+  * Cocoa: Cocoa percentage (darkness) of the chocolate bar being reviewed.
+
+  * Location: Manufacturer base country.
+
+  * Rating: Expert rating for the bar.
+      5= Elite (Transcending beyond the ordinary limits)
+      4= Premium (Superior flavor development, character and style)
+      3= Satisfactory(3.0) to praiseworthy(3.75) (well made with special qualities)
+      2= Disappointing (Passable but contains at least one significant flaw)
+      1= Unpleasant (mostly unpalatable)
+
+   * Type: The variety (breed) of cocoa bean used, if provided.
+   
+   * BroadOrig: The broad geo-region of origin for the bean.
+
+Note this dataset and description come from: © 2018 Kaggle Inc for further details visit:
+
+[Kaggle.com](https://www.kaggle.com/rtatman/chocolate-bar-ratings/data)
+
+
+If you want to give your critiquers some ideas about what you have questions on and would like help with, place those details here.-->
+
+
+<!--End your comments to your critiquers before this line.-->
+
+----
+
+<!--Begin writing your Analysis after this point.-->
+
+
+
+
+
+
+
+

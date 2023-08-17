@@ -1,0 +1,127 @@
+---
+title: "ChiSquared"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+```{r, message=FALSE, include=FALSE}
+
+library(readr)
+library(ggplot2)
+GSS2012 <- read_delim("../../Data/GSS2012.csv", 
+                      "\t", escape_double = FALSE, trim_ws = TRUE)
+library(dplyr)
+library(mosaic)
+library(tidyverse)
+library(pander)
+```
+
+## Chisquared Tests Example
+
+### Topic:Bible Views And Frequency of Prayer
+
+One would expect ones view of the origin and composition of the bible to coincide with ones veiw on frequency of prayer.  Not its important to not that there are many forms of prayer and not all surveyed would neccesarily be on the Christian View of the Origin of the bible.  That said one would reasonably expect a high correlation between the origins of the bible and the frequency of prayer to increase the more direct a source of inspiration the bible is.  But lets find out if thats true.
+ 
+
+```{r, message=FALSE}
+##Filtering the Data
+
+GS2<-filter(GSS2012, pray %in% c(1,2,3,4,5,6))
+       GS2<-filter(GSS2012, bible %in% c(1,2,3))
+       
+       GS2<-GS2 %>% 
+         mutate( 
+           bible=case_when(
+             GS2$bible==1 ~ "Word Of God",
+             GS2$bible==2 ~ "Inspired Word",
+             GS2$bible==3 ~ "Book of Fables",
+      
+        )
+         )
+           
+           GS2<-GS2 %>%  
+             mutate(
+           pray=case_when(
+             GS2$pray==1 ~ "Several Times A day",
+             GS2$pray==2 ~ "Once A Day",
+             GS2$pray==3 ~ "Several times a week",
+             GS2$pray==4 ~ "Once a Week",
+             GS2$pray==5 ~ "Less than once a week",
+             GS2$pray==6 ~ "Never",
+         ))
+```
+
+
+
+
+
+```{r, message=FALSE}
+prayert<-table(GS2$pray)
+
+biblet<-table(GS2$bible)
+
+praybiblet<-table(GS2$pray, GS2$bible)
+
+  t2<-table(Pray=GS2$pray,Bible=GS2$bible)
+```
+
+## Data
+
+```{r}
+pander(t2)
+```
+
+
+This test is a test to see if the proportions of the information are the same or if there is a variation that would suggest, that if there is a difference there will or may also be a relationship.  For example if Word of God has a hiring and pray daily occurs to a higher rate than they would be expected to normally through random chance then this suggests there is a relationship of some kind between these two factors.  If they comem out to be almost the same for each than there is no relationship.
+
+
+## Assumptions 
+
+```{r, message=FALSE}
+
+pander(chi.t2$expected > 5)
+
+```
+
+The assumptions of this test are as that there are atleast 5 of each combination.  Further as the P Value is a shocking low 5.491e-139 it is extremly significant meaning we reject the null hypthosis that all of these are the same or close too it.
+
+```{r, message=FALSE}
+pander(chi.t2 <- chisq.test(t2))
+```
+
+
+
+
+```{r, message=FALSE}
+pander(mean(chi.t2$expected))
+```
+
+## Hypthosis
+
+$$
+  H_{01}:\ \text{Bible View and Prayer Frequency are not related}
+$$
+
+
+$$
+  H_{a1}:\ \text{Bible View and Prayer Frequency are Related}
+$$
+
+
+
+
+```{r}
+pal<-palette(c("red","orange1","yellow1","green1","blue1","darkmagenta"))
+
+barplot(t2, beside=TRUE, xlab="View Of Bible", main="View of the Bible and Prayer", col=pal)
+
+legend("topleft", pch=20,legend=c("Less Than Once A week", "Never", "Once A Day", "Once A Week", "Several Times A Day", "Several Times A Week"), col=pal, cex = .6)
+```
+
+## Conclusion and Interpretation
+
+As can be seen above the Views of the Bible Conconcide with frequency of prayer in the study.  The more inspired the bible was considered to be the more frequently the individual also prayed.  Likewise the less inspired the bible was considered to be the less frequently the indivudal prayed.  

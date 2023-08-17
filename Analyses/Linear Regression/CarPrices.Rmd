@@ -1,0 +1,174 @@
+---
+title: "Car Prices"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<br>
+
+## Background
+
+# How well does a brand of car retain its value over time?  
+
+Thats the purpose of this analysis to test if there is a significant difference in how well two brands of cars retain their value as their mileage increases.  This Analysis is not looking to see if a difference exisits between values themselves just the rate of their change.  
+
+To explore that lets look at the makes of car we'll be testing today.  Cadillacs and Buicks. Mostly because they came up first, Cadillacs and Buicks, which is a better buy between the two, for retaining its value?
+
+  The Goal is to see how well Buicks and Caddalics retain their value as their mileage increases.  The Method for doing this is to see the rate of change of their price value as their mileage increases.
+
+We are operating using a 95% confidence interval.  Meaning any P value will have to be lower than .05 to qualify as being significant.  This reduces the risk of making type 2 error.
+
+```{r, include=FALSE}
+# Be sure to download the CarPrices.csv file and save it
+# into your Data folder prior to knitting this file.
+library(pander)
+library(car)
+library(DT)
+library(mosaic)
+library(tidyverse)
+
+
+CarPrices <- read.csv("../../Data/CarPrices.csv", header=TRUE)
+
+CP2<-CarPrices %>% group_by(Make)
+
+CP3<-filter(CP2, Make=="Cadillac" | Make=="Buick")
+
+CP4lm<-lm(Price ~ Mileage + Make + Mileage:Make, data=CP3)
+pander(summary(CP4lm))
+b<-CP4lm$coefficients
+
+CP5lm<-lm(Price ~ Mileage + Make, data=CP3)
+
+
+```
+
+
+## Setting Up The Test
+
+#### Choosing Two Samples
+
+As seen above.  Buicks and Cadicallcs are the closest related.
+It would be good practice to compared two similary starting prices.
+
+```{r}
+
+
+CarPrices %>% group_by(Make) %>% summarize(samplesize=n()) %>% filter(samplesize >20) %>% pander()
+                                       
+```
+
+Now for a test of normality of the data
+
+```{r}
+par(mfrow=c(1,3))
+plot(CP4lm, which=1)
+qqPlot(CP4lm$residuals, main = "Q-Q Plot", id=FALSE)
+plot(CP4lm$residuals, main = "Residuals vs Order")
+
+```
+
+As can be seen above there is a line of car that is FAR above the cost of other types.  It is an outlier that needs to be removed.  The XLR-V8 Convertible from Cadillac is skewing the data.  It is in a class of its own.  Being a luxury convetible isnt a fair comparision to Sedans.  
+
+
+```{r}
+##Fitlering out the Super Car
+CP3<-filter(CP3, Model!="XLR-V8")
+```
+
+With the Removal of the outlier wiwth some low riding makes on the bottom the QQ plot appears to satisify the constraints.
+
+
+## Comparrision of Sedans
+
+Having Removed the Outlier Model we see the data is starting to behave normally.
+
+```{r}
+CP5lm<-lm(Price ~ Mileage + Make, data=CP3)
+par(mfrow=c(1,3))
+plot(CP5lm, which=1)
+qqPlot(CP5lm$residuals, main = "Q-Q Plot", id=FALSE)
+plot(CP5lm$residuals, main = "Residuals vs Order")
+
+```
+
+The Residual versus Order is throwing up some red flags. There are clusters of the data, those being specific models of cars.  However the spreading of the clusters is enough for me to feel satsified with the use of this data.  
+
+## Hypothesis
+
+There are Multipule Hypthosis that are being tested here.  
+
+**The First**
+
+$$
+  H_0: \beta_2 = 0 \quad \text{(Equal average cost when brand new)} \\
+  H_a: \beta_2 \neq 0 \quad \text{(Non-equal average cost when brand new)}
+$$
+
+The Confidence level for this test is the default .95 meaning the Alpha is .05.  If our P value is lower than .05 we reject our null hypthosis, and our test (and model) are signficant.
+
+## Model
+
+Should the test come back significant than the model would be as follows.
+
+$$
+  \text{Price} = \text{Cost of a Car With No Miles} + \text{Rate Of Change} \times \text{(Milage)}
+$$
+
+## Analysis
+
+Having been stasified with the data to my understanding.  We can procceed with the test of significance.    
+
+This is again a comparision of if a significant differnce exisits in the slopes of the deprecation of the two.  Or in other words.  Is there a significant difference in the rates of change prices of the two brands as their mileage increases.
+
+Do they change at different rates?  Or is it the same?
+
+### Whats happening here?
+
+```{r}
+CP5lm<-lm(Price ~ Mileage + Make, data=CP3)
+par(mfrow=c(1,3))
+plot(CP5lm, which=1)
+qqPlot(CP5lm$residuals, main = "Q-Q Plot", id=FALSE)
+plot(CP5lm$residuals, main = "Residuals vs Order")
+
+
+plot(Price ~ Mileage,  col= as.numeric(Make)+3 , data=CP3, main="Buick V Cadailac Price Versus Milage")
+b<-CP5lm$coefficients
+palette(c("blue3","deepskyblue1"))
+curve(b[1]+b[2]*x, add=TRUE, lwd=2, col='lightcoral')
+curve((b[1] + b[3]) + b[2] * x, col="goldenrod1", lwd=2, add=TRUE)
+ legend("topright", col=palette(), pch=21, legend=c("Buick", "Cadailac"), bty="n", text.col = palette())
+```
+
+## Interpretation
+
+```{r}
+CP4lm<-lm(Price ~ Mileage + Make + Mileage:Make, data=CP3)
+pander(summary(CP4lm))
+```
+
+
+
+The above summary is displaying the Multipule Linear Regression of Price, Milage, Make, and the relationship between Milage and Make.  
+
+Beta 2 is the most important Hypthosis here.  It is Testing to see if there is a signicnat difference in the change of the Y intercept for the second line. Again with a P value of .01 it is significant enough for us to reject the null hypthosis that B2=B1, or in other words that these lines are not the same.
+
+```{r}
+CP6<-CP3 %>% 
+mutate( PriceRange=
+case_when(Price > 40000 ~ "Why Do You Have So Much Money",
+          Price < 10000 & Price > 20000 ~ "Cheap",
+          Price > 20000 & Price < 30000 ~ "Normal",
+          Price < 30000 & Price < 40000 ~ "High End")
+)
+```
+
+
+
+## Conclusion
+
+So as can be seen in the data.  The only signifcnat differences between the groups are the starting prices.  Yes the two groups are different, Cadillacs are far more expensive however, it would seem there is not a significant difference between the rates of deprciation of the two models. As the regresssion test of significane and graph shows.
+

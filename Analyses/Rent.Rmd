@@ -1,0 +1,102 @@
+---
+title: "Rent"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+**Week 1 Analysis**
+
+```{r, warning,message=FALSE}
+library(mosaic)
+library(pander)
+library(tidyverse)
+library(DT) 
+library(dplyr)
+Rent <- read_csv("../Data/Rent.csv")
+```
+
+
+<br />
+
+## Background
+
+Here is a data table showing the available approved housing apartment options at BYU-Idaho for single students. There are 122 entries comprising 57 female and 65 male apartment options.
+
+
+```{r, warning=FALSE}
+# Code to get you started. 
+# View(...) works great in the Console, but datatable(...) must be
+# used instead within an R-chunk.
+datatable(Rent, options=list(lengthMenu = c(3,10,30)), extensions="Responsive")
+```
+
+Below are just some points of interest.
+
+
+```{r}
+Rent %>%
+  summarise(`Average Price`=mean(Rent$Price,na.rm=TRUE),  
+`Cheapest Rent Cost`=min(Rent$Price,na.rm=TRUE),
+`Highest Rent Cost`=max(Rent$Price,na.rm=TRUE),
+`Highest Rent Cost`=max(Rent$Price,na.rm=TRUE)) %>% pander()
+
+Rent %>% 
+  summarise(
+`Average Price of A private Room`=mean(Rent$PrivateRoomPrice,na.rm=TRUE),
+`Average Deposit Cost` =mean(Rent$Deposit,na.rm=TRUE)) %>% pander()
+
+Rent %>% 
+  summarise(
+`Most Deposit Cost`=max (Rent$Deposit,na.rm=TRUE),
+`Average Walking Time to Campus`=mean(Rent$WalkingMinutes,na.rm=TRUE)
+)%>%
+  pander()
+
+```
+
+
+## Graphic
+
+
+
+```{r}
+# Use this R-chunk to...
+# ...Create an interesting graphic using the Rent data set.
+
+
+
+
+B<-Rent %>%  filter(Gender=="M") %>% tally()
+G<-Rent %>% filter(Gender=="F") %>% tally()
+
+plot(Rent$Price, ylab="Price", xlab="Complexes", main="Plot Of Complexes", col="Maroon")
+
+
+
+
+```
+
+The Graph Above shows the distribution of the prices of the complexes in Rexburg.  It's a large spread.  Though there is some clustering partly brought on by complexes that offer both guy and girl contracts at the same rate counting as two data points, but this doesnt account for ever closely associated data point, there is extensive variation of the prices in Rexburg.
+
+Here is a Data Frame of Listed Price Of Each Complex With Their Month Rate Assuming a 4 month contract.
+
+```{r}
+
+DT<-data.frame("Apartment"=Rent$Apartment,"Monthly Price"=(Rent$Price/4))
+
+datatable(DT, options=list(lengthMenu = c(3,10,30)), extensions="Responsive")
+
+```
+
+
+
+
+## Conclusion
+
+Rexburg offers a great deal of vairtey in its housing complexes prices.  Its safe to assume not all apartment complexes charge the same rate.  
+
+

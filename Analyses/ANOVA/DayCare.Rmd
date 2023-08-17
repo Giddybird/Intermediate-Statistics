@@ -1,0 +1,317 @@
+---
+title: "Day Care Fines"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+
+library(mosaic)
+library(DT)
+library(pander)
+library(car)
+library(tidyverse)
+
+# To get the "late" dataset into your R Console, 
+# you need to go to your file menu of R-Studio and select
+# "Session, Set working directory, To source file location"
+# Then click the green "play" arrow in 
+# the top right corner of this gray R-Chunk. 
+
+## Wide data from original article:
+Late <- read.csv("../../Data/late.csv", header=TRUE) 
+
+Late <- reshape(Late,
+  varying = paste("Week",1:20, sep=""), 
+  v.names = "No.ofLateChildren",
+  timevar = "Week", 
+  times = 1:20, 
+  idvar = "Center",
+  new.row.names = 1:200,
+  direction = "long")
+
+
+
+```
+
+
+
+----
+
+<!--If you want to give your critiquers some ideas about what you have questions on and would like help with, place those details here.-->
+
+**Comments to Critiquers:** 
+
+This Data Presented some interesting questions findings.  In checking them I used many repeative iterations of the data to check and later confirm my findings.  It is this reason that there are so many reduant graphs. Because each was checking some part of the Analysis that threw up flags.  For example I wanted to differentiate between the control and the fined group.  So I graphed the two seperately.
+It shows that between the two different groups there is a signifcant increase in the fine group suggesting that the control group was accutally a 'reducing' factor in the combinded groups.  Suggesting that all is not what appears to be right away
+
+Futher.  The data structure of this html file is alittle odd and most of my work is in the last tab.
+
+Decimal Percentages Are Percentage Overall Left Late With 1 being 100% and .2 being 20% of the students.
+
+If you had acctually read my assignment you would have found there IS analysis in it already just not using the Anlaysis tabs.  
+
+<!--End your comments to your critiquers before this line.-->
+
+----
+
+
+## Background {.tabset .tabset-fade}
+
+### Overview
+<!-- Be sure to add your own background here before beginning the Analysis. -->
+
+The Study is one that follows a test of a day care fine for children left late at the school. 
+
+It covers a period before the fine, during the fine, and after the fine to measure the impact of the fine one how many children were picked up late from school.   
+
+
+
+### Study Details
+
+<div style="color:#a8a8a8;">
+This background is quoted directly from the article ["A Fine is a Price"](http://rady.ucsd.edu/faculty/directory/gneezy/pub/docs/fine.pdf). 
+</div>
+
+<div style="padding-left:30px; padding-right:30px;">
+
+There are two types of day-care centers in Israel: private and public. A study was conducted in 10 private day-care centers in the city of Haifa from January to June 1998. All of these centers are located in the same part of town, and there is no important difference among them. During the day children are organized into groups according to age, from 1 to 4 years old. Each day-care center is allowed to hold a maximum of 35 children. In some exceptional cases a few additional children are allowed. The fee for each child is NIS 1,400 per month. (The NIS is the New Israeli Shekel.) At the time of the study, a U.S. dollar was worth approximately NIS 3.68, so the fee was about $380 at that time. 
+
+The contract signed at the beginning of the year states that the day-care
+center operates between 0730 and 1600. There is no mention of what happens if parents come late to pick up their children. In particular, before the beginning of the study, there was no fine for coming late. When parents did not come on time, one of the teachers had to wait with the children concerned. Teachers would rotate in this task, which is considered part of the job of a teacher, a fact that is clearly explained when a teacher is hired. Parents rarely came after 1630. 
+
+A natural option [to fix the problem of parents showing up late] is to introduce a fine: every time a parent comes late, [they] will have to pay a fine. Will that reduce the number of parents who come late? If the fine is removed, will things revert back to the way they were originally?
+
+The overall period of the study was 20 weeks. In the first 4 weeks we
+simply recorded the number of parents who arrived late each week. At the
+beginning of the fifth week, we introduced a fine in six of the 10 day-care centers, which had been selected randomly. The announcement of the fine was made with a note posted on the bulletin board of the day-care center. Parents tend to look at this board every day, since important announcements are posted there. The announcement specified that the fine would be NIS 10 for a delay of 10 minutes or more. The fine was per child; thus, if parents had two children in the center and they came late, they had to pay NIS 20. Payment was made to the principal of the day-care center at the end of the month. Since monthly payments are made to the owner during the year, the fines were added to those amounts. The money was paid to the owner, rather then to the teacher who was staying late (and did not get any additional money). The teachers were informed of the fine but not of the study. Registering the names of parents who came late was a common practice in any case.
+
+At the beginning of the seventeenth week, the fine was removed with no explanation. Notice of the cancellation was posted on the board. If parents asked why the fines were removed, the principals were instructed to reply that the fine had been a trial for a limited time and that the results of this trial were now being evaluated.
+
+A comparison with other fines in Israel may give an idea of the size of
+the penalty that was introduced. A fine of NIS 10 is relatively small but not insignificant. In comparison, the fine for illegal parking is NIS 75; the fine for driving through a red light is NIS 1,000 plus penalties; the fine for not collecting the droppings of a dog is NIS 360. For many of these violations, however, detection and enforcement are low or, as in the case of dog dirt, nonexistent in practice. A baby-sitter earns between NIS 15 and NIS 20 per hour. The average gross salary per month in Israel at the time of the study was NIS 5,595.
+
+</div>
+
+
+### The Data (Wide)
+
+
+The `Late` Day Care Center data is shown here in the "wide data format". 
+
+```{r, out.width=300}
+#Show the full width of the "Wide" version of the late data:
+pander(Late, split.tables = Inf)
+
+```
+
+
+### The Data (Long)
+
+The `Late` Day Care Center data is shown here in the "long data format".
+
+
+
+```{r}
+pander(Late)
+Late$Week<-as.numeric(Late$Week)
+Late$WeekGroup <- cut(Late$Week, c(0,4,16,20),labels=c("Before Fine","During","After Fine"))
+
+ 
+```
+
+
+
+```{r}
+#Creating a Colloum for Percentage Of Late Children.  
+Late<-Late%>%
+  mutate(PercentageLate=Late$No.ofLateChildren / Late$No.ofChidren)
+```
+
+Explination: The idea behind this is to avoid cases where perhaps a large or small population would create a misleading impression.  Percentages are often confusing or can obscure the truth for example 50% more effective could mean that it just worked for a smaple size of 2 out of 4 as opposed to the previous 1 out of 4.  However, it also can make a more equal playing feild for example a sinlge or even 30 absent students in a school of 100 are a different thing when compared to a school of 1000 or 2000.  Indeed if a school of 2000 could have a lower late percentage than a school fo 100 that would be meaningful and worthy of study.  Still caution must be exercised when working with percentages.  
+
+
+```{r}
+#Fitler by Control Versus Fine
+
+FDControl<-droplevels(filter(Late, Treatment!="Fine"))
+FDFine<-droplevels(filter(Late, Treatment!="Control"))
+
+```
+
+
+### Test For Normality
+
+First, We have to check if the data is normal enough to be used.
+
+```{r}
+Fineaov<-aov(PercentageLate~Treatment + WeekGroup + Treatment:WeekGroup, data=Late)
+par(mfrow=c(1,3))
+plot(Fineaov, which=1:3, pch=16)
+```
+
+
+As seen above the data is impressively normal to warrant its used in an ANOVA test.  With strong spread around the line in the reesiduals plot meaing the assumption of constant variance is satisifed, and a tight fit to the line of best fit in the QQ plot.  
+
+### Hypthosis
+
+Anova of those percantage late at each phase to test if there is a difference in how many children are late between each phase.  If yes then I continued studied is warranted.  If no, then there is no value to the fines (as they are) excpet as a means of generating reveune.
+
+anova of those percantage late at each phase to test if there is a signicnat difference between the mean of each group being tested.  The groups in question in this analyis being first, the week groups (or periods of the trail).  The test checking to see if a significnat difference exisits between the means of the percentage of children late between the week groups of the data.  
+
+The second being, if a significant difference among the different treatments used.
+
+The third being if a significant difference exisited between the treatment and week groups.  
+
+In an equation it could be repesent below.
+
+$$
+  H_0: \mu_A = \mu_B = \mu
+$$
+
+
+$$
+  H_a: \mu_A \neq \mu_B 
+$$
+
+
+
+For this test we will be using a 95% confidence internval meaning our Alpha will be .05 if any P value is below .05 than atleast one of the means of measured value for that group is signifcantly different than the others.  Meaning, there is cause for further exploration as the null of "everything is more or less the same" has been found sufficent evidence to suggest that "mean of this value is not the same across all groups in the test".   
+
+If any of the P value is greater than or equal to .05 than we have sufficent evidence to suggest in that area, there is little variation in the mean value.
+
+In this test the value being measured is the number of late children.  The groups the test is comparing is the Treatment, Weekgroup, and the Treatments and Week Groups.
+
+The Hypthosis can be visualized as seen below.
+
+1. Does the type of `Grouping Type` affect the avereage number of Late Children?
+With A B being the average late children as for each group.  The uneffected control group (where no fine was implemented), and the expirmental fined group.  It is assumed that the two groups would have no difference between them, this is the null hypthosis $H_0$ The alterative $H_a$ to this would be that there is a differnce in the mean of the two groups.
+
+Factor: `Treatment` with levels $A$ and $B$.
+$$
+  H_0: \mu_A = \mu_B = \mu
+$$
+
+$$
+  H_a: \mu_A \neq \mu_B 
+$$
+
+2. Does the `Week Group` affect the average number of Children Picked Up Late?  
+
+Factor: `WeekGroup` with levels $Before$, $During$, and $After$ the implementation of the fine.
+$$
+  H_0: \mu_\text{Before} = \mu_\text{During} = \mu_\text{After} = \mu
+$$
+
+
+$$
+  H_a: \mu_i \neq \mu \ \text{for at least one}\ i\in\{1=Before,2=During,3=After\}
+$$
+
+It is assumed that there would be no difference in each section of the expirment.  Should that alpha be signifcant than it would become clear that atleast one of the week groups had a unexpected value meaning something was different in atleast one of the periods of the test as seen by the average number of late children, meaning something was happening that wasnt expected meaning we should proceed with further exploration.
+
+
+3. Does the effect of `Week Grouping` change for different the Control and Expirement Group, known here as `treatment`? (Does the effect of `treatment` change for different levels of `Week Grouping`?) In other words, is there an interaction between `Treatment`(being fined) and `Week Grouping`(the period in the study of the fine)?  If there is not then we can conlcude the fine is worthless and has no effect on the overall number of late children as it neither changed between the two groups OR the period of the experience (meaning that there were  would be the same number of children late in both the treatment and control and during each phase of the expirement)
+ 
+$$
+  H_0: \text{The effect of `Being Fined` is the same for the entirity of the expirment in regardless of `Treatment`.}
+$$
+
+
+$$
+  H_a: \text{The effect of `Being Fined` is not the same for all periods of the expirement.}
+$$
+
+With that in mind, and astaisfieed that the data is normal enough to be used we can proceed with the test of significance in this case an ANOVA test.
+
+
+### Analysis
+
+
+```{r}
+  pander(summary(Fineaov))
+```
+
+As seen above.  The data in all three tesst is statsitcally significant.  Each test having a signifcnat P value well below the alpha of .05, as can be seen in the last column.
+
+Meaning there is sufficent evidence to suggest that atleast one of the means (the means in every test was signficnalty different than the others. This is the case in factors of the Treatment (being fined or not). Week Group (the period during the expirment, i.e. before, during or after the fine).  
+
+Or in other words there is sufficent evidence to reject the every previously stated null hypthosis t
+
+One last way to put it, the difference between the means is not zero to a high degree of stastical significance  Meaning there is something going on here that we didnt expect to see if there was no difference between the period during the expeirment and weither or not they were being in the control group or not. Meaning there is a differnece between the week groups, the approaches and the week groups of the two different approaches.
+
+This warrants futher investigation as to how they differ.
+
+### Graphs And Tables
+
+Below is a graph showing the change in the percetnage of late children throughout the trial period for both the control (in blue) and the fined group (in pink).  
+
+```{r}
+xyplot(PercentageLate ~ WeekGroup, data=Late, groups=Treatment, type=c("p","a"), main="Significance of the Interaction", auto.key=list(corner=c(1,1)))
+```
+
+
+As can be seen here.  The difference between the two groups is different than one might have supposed.  What is happening here is  the percentage of children late is sky rocketing when the fine was implemented among hte fined the group where as the unfined group did not change.  Not only that but once the fine was removed it continued to increase just slightly among the fined group, where as the unfined group further decreased.
+
+
+ 
+ 
+```{r}
+Late %>%
+  group_by(Treatment, WeekGroup) %>%
+  summarise(ave=mean(PercentageLate)) %>%
+  spread(Treatment, ave) %>%
+  pander(caption="Mean Number of Children Late In Each Phase, Seperated By Control")
+
+
+```
+ 
+ Above is shown the a table of the means of each group during each phase of the expirement.  As the fine aws implemented the number of late children among the fined category doubled in during its use. And then while the number of late children didnt drop after the fine ended the rate of growht reduced signifcantly down to only an increas of 2 more late children on average.
+ 
+ For the sake of numbers. It was easier to see the difference in this case using just the number of late children As it looked better than a decimal though the data tells the same story on a graph.  
+ 
+ 
+ First, A plot of the number children late by perecentage seemed warranted.  The number of children late could vary in number by the school and so a percentage in this case would show the impact on the school more accurately then number of late students only.
+ 
+``` {r}
+xyplot(PercentageLate ~ Treatment, data=Late, type=c("p","a"), main="Differnce In Methods", col='azure4') 
+```
+
+As seen above.  There was a signicant drop in the percentage fo children left late among the unfined control group compared the fined group.
+
+```{r}
+Late %>%
+  group_by(Treatment) %>%
+  summarise(ave=mean(PercentageLate)) %>%
+  spread(Treatment, ave) %>%
+  pander(caption="Average Number of Children Left Late Seperated By Treatment")
+
+
+```
+ 
+ 
+```{r}
+xyplot(PercentageLate ~ WeekGroup, data=Late, type=c("p","a"), main="Phase of the Expirement", ylab="Children Late", xlab="Phase of Study") 
+
+Late %>%
+  group_by(WeekGroup) %>%
+  summarise(`Mean Warp Breaks`=mean(PercentageLate)) %>%
+  pander(caption="Mean Warp Breaks according to Tensiol Level")
+```
+ 
+ 
+ 
+### Conclusion
+
+  The expirement would need to be repeated, to be done again, and again to see if the same patterns emereged. That said.  This time through the expirment it seems the fine only made things worse when it was used, accutally increasing the number of late children when there had been a LOWER number of late children before its implemnation.  Further, after the fine was removed to number of late children went up even higher that it had when the fine was implemented.
+  Juxatposuing this with the control group that saw an overall drop over the period in question it casts some doubt on the effectiveness of fines in these schools.  
+  The explinations of this would be interesting to look at.  That said there's still the need of recreating the expirement.  
