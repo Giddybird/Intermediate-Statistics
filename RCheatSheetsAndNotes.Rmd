@@ -1,0 +1,304 @@
+---
+title: "R Cheat Sheets & Notes"
+---
+
+## Cheat Sheets
+
+* [R Colors](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf)
+
+* [R Base Graphics Cheat Sheet](http://www.joyce-robbins.com/wp-content/uploads/2016/04/BaseGraphicsCheatsheet.pdf)
+
+* [R Base Commands Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf)
+
+* [R Markdown Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+* [Keyboard Shortcuts](https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts)
+
+## Notes
+
+Add your own notes here...
+
+```{r}
+# Add R commands you want to remember here...
+
+```
+
+```{r}
+# Or create other R chunks to put them in like this...
+
+```
+
+```{r, eval=FALSE}
+# Using ```{r, eval=FALSE} turns off the chunk, but still shows it.
+# Useful when you want to remember code, but not run it in this file.
+```
+
+
+```{r, eval=FALSE}
+
+# Create the data:
+set.seed(1140411)
+sample1 <- rnorm(30, 69, 2.5)
+sample2 <- rnorm(30, 69, 2.5)
+theData <- data.frame(values = c(sample1,sample2), group = rep(c(1,2), each=30))
+View(theData)
+boxplot(values ~ group, data = theData)
+
+ 
+
+# Run the permutation test:
+
+myTest <-  t.test(values~group, data=theData, mu=0)
+observedTestStat <- myTest$statistic
+observedTestStat
+ 
+
+N <- 2000      
+permutedTestStats <-  rep(NA, N)
+for  (i in 1:N ) {
+   permutedData <- sample(x=theData$group)
+   permutedTest <- t.test(values~permutedData,data=theData, mu=0)
+   permutedTestStats[i]  <-  permutedTest$statistic
+}
+hist(permutedTestStats)
+abline(v=observedTestStat)
+sum(permutedTestStats >= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)*2/N
+
+```
+
+
+
+
+set.seed(121)
+sample1 <- rnorm(30, 185, 8)
+sample2 <- sample1 - rnorm(30, 0, 3.5)
+theData <- data.frame(values = c(sample1,sample2), group = rep(c(1,2), each=30), id = rep(c(1:30),times=2))
+View(theData)
+with(theData, hist(values[group==1] - values[group==2]))
+```
+
+
+mean(sample1)-mean(sample2)
+mean(sample2)-mean(sample1)
+```
+
+
+
+
+# Create the data:
+
+set.seed(121)
+sample1 <- rnorm(30, 185, 8)
+sample2 <- sample1 - rnorm(30, 0, 3.5)
+theData <- data.frame(values = c(sample1,sample2), group = rep(c(1,2), each=30), id = rep(c(1:30),times=2))
+View(theData)
+with(theData, hist(values[group==1] - values[group==2]))
+
+ 
+
+# Perform the permutation test:
+
+myTest <-  t.test(values~group,data=theData, paried=TRUE,m=0)
+observedTestStat <- myTest$statistic
+
+ 
+
+N <- 2000      
+permutedTestStats <-  rep(NA, N)
+for  (i in 1:N ){
+   permutedData <- sample(x=c(1,-1), size=30,replace=TRUE)
+   
+   permutedTest <- with(theData, t.test(permutedData * values[group==1]-values[group==2],mu=0)
+   permutedTestStats[i]  <-  permutedTest$statistic
+}
+
+hist(permutedTestStats)
+abline(v=observedTestStat)
+sum(permutedTestStats >= observedTestStat)/N
+sum(permutedTestStats <= observedTestStat)/N
+
+```
+
+
+## ANOVA AND REPLACEMENT EXAMPLE
+
+
+
+  choc$Cocao <- as.numeric(gsub("%","",choc$Cocao))
+
+Chocaov<-aov(Cocao~BroadOrig, data=choc)
+  par(mfrow=c(1,2))
+plot(Chocaov, which=1:2, pch=16)
+```
+
+## KRUSKAL WALLACE
+**Make A Table Summary**
+
+Friendly %>%
+  group_by(condition) %>%
+  summarise(min = min(correct), median = median(correct), mean = mean(correct), max = max(correct), sd = sd(correct), `Number of Students` = n()) %>%
+pander(caption="Summary Of Results")
+```
+
+Normal QQ Plot
+
+
+qqnorm(Friendly$correct)
+qqline(Friendly$correct)
+```
+
+Strip Chart
+
+stripchart(Friendly$correct~Friendly$condition, method="stack", xlab="Number Remembered Accurately of 40", main="Which Learning Method is the Best", ylab="Learning Method")
+
+```
+
+Wilcoxan Test
+
+
+pander(
+wilcox.test( correct ~ condition, data=F5, mu=0, alternative="two.sided" , confidence=0.95)
+)
+```
+
+Filtering: for LM and Select
+
+
+gp<-filter(OWD, hero=="Genji")
+gp1<-filter(gp, stat_name=="Dragonblade Efficiency" | stat_name=="Eliminations" | stat_name=="Dragonblades")
+
+gp2<-select(gp1, "stat_amount", "player", "stat_name", "start_time") %>% group_by(start_time, player) %>%
+  pivot_wider(names_from = stat_name, values_from = stat_amount) %>% 
+  rename(Dragonblade_Efficiency="Dragonblade Efficiency") %>% 
+  mutate(Dragonblade_Efficiency=ifelse(is.na(Dragonblade_Efficiency), 0, Dragonblade_Efficiency)) %>% 
+  mutate(Dragonblades=ifelse(is.na(Dragonblades), 0, Dragonblades))
+```
+
+Filtering: Linear Model Genji Example
+
+
+genjilm <- lm(Eliminations ~ Dragonblade_Efficiency, data=gp2)
+par(mfrow=c(1,3))
+plot(genjilm, which=1)
+qqPlot(genjilm$residuals, id=FALSE)
+plot(genjilm$residuals, main="Residuals vs Order")
+```
+
+
+FB <- lm(Eliminations ~ Dragonblade_Efficiency, data=gp2)
+pander(summary(FB))
+```
+
+plot(Eliminations ~ Dragonblade_Efficiency, data=gp2, pch=20, col="firebrick", cex=1.2, las=1,
+     xlab="DragonBlade Efficcney", ylab="Eliminations",
+     main="Eliminaitons Correlated with DragonBlade Efficiency")
+
+genjilm <- lm(Eliminations ~ Dragonblade_Efficiency, data=gp2)
+abline(genjilm, lwd=2, col=rgb(.689,.133,.133, .3))
+abline(h=seq(0,120,20), v=seq(5,25,5), lty=2, col=rgb(.2,.2,.2,.2))
+
+**LM HomeWise**
+
+ProductDiversityLM<- lm(Total_Royalties ~ Unique_Product_Types, data=PDZ2)
+
+
+
+## GG Plot Sideways Graph
+
+Royalty2P<-Royaltiesbystore %>% ggplot(aes(x=reorder(Store, Total_Royalties_Earned), y=Total_Royalties_Earned), ylab="Quantity of Product Sold") + geom_col(fill="firebrick", color="black") + coord_flip()
+
+Royalty2P + ggtitle("Stores Reveune") + ylab("Total Reveune") +xlab("Store")
+
+**Linear Model Graph**
+
+par(mfrow=c(1,1))
+plot(Total_Royalties ~ Unique_Product_Types,  col= "red" , data=PDZ2, xlab="Unique Number of Product Types Sold By Store", ylab="Total Reveune Generated")
+b<-ProductDiversityLM$coefficients
+curve(b[1]+b[2]*x, add=TRUE, lwd=2, col='goldenrod')
+curve((b[1] + b[3]) + (b[2] + b[4])*x, col="lightcoral", lwd=2, add=TRUE)
+
+
+## Chi Squared Test of Independence
+
+
+##Filtering the Data
+
+GS2<-filter(GSS2012, pray %in% c(1,2,3,4,5,6))
+       GS2<-filter(GSS2012, bible %in% c(1,2,3))
+       
+       GS2<-GS2 %>% 
+         mutate( 
+           bible=case_when(
+             GS2$bible==1 ~ "Word Of God",
+             GS2$bible==2 ~ "Inspired Word",
+             GS2$bible==3 ~ "Book of Fables",
+      
+        )
+         )
+           
+           GS2<-GS2 %>%  
+             mutate(
+           pray=case_when(
+             GS2$pray==1 ~ "Several Times A day",
+             GS2$pray==2 ~ "Once A Day",
+             GS2$pray==3 ~ "Several times a week",
+             GS2$pray==4 ~ "Once a Week",
+             GS2$pray==5 ~ "Less than once a week",
+             GS2$pray==6 ~ "Never",
+         ))
+```
+
+
+
+prayert<-table(GS2$pray)
+
+biblet<-table(GS2$bible)
+
+praybiblet<-table(GS2$pray, GS2$bible)
+
+  t2<-table(Pray=GS2$pray,Bible=GS2$bible)
+
+
+
+
+pander(chi.t2$expected > 5)
+
+
+
+pander(chi.t2 <- chisq.test(t2))
+```
+
+
+pander(mean(chi.t2$expected))
+```
+
+## Logisitic Regression
+
+blow.glm <- glm(y>0 ~ D, data=blowAPB, family=binomial)
+summary(blow.glm)
+b<-coefficients(blow.glm)
+
+**Plotting**
+
+plot( y>0 ~ D, data=blowAPB, main="", ylab='Probability of Tree Dying', xlab="Tree Diameter in cm)", pch=16)
+curve(exp(b[1]-b[2]*x)/(1-exp(b[1]-b[2]*x)), from=1, to=60, add=TRUE)
+```
+
+**Holsten Test (test of normality of logisitc regression**   
+
+pander(hoslem.test(blow.glm$y, blow.glm$fitted, g=6))
+
+##Kruskal Wallace
+
+kruskal.test(choc2$Cocao, choc2$BroadOrig, data=choc2) %>% pander()
+
+pander(favstats(Cocao ~ BroadOrig, data=choc2)[,-10])
+
+
+## Wilcox Test:
+
+pander(
+wilcox.test( correct ~ condition, data=F5, mu=0, alternative="two.sided" , confidence=0.95)
+)

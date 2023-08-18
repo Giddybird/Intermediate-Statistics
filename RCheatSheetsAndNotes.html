@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>R Cheat Sheets &amp; Notes</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Statistics Notebook</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    R Help
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="RCommands.html">R Commands</a>
+    </li>
+    <li>
+      <a href="RMarkdownHints.html">R Markdown Hints</a>
+    </li>
+    <li>
+      <a href="RCheatSheetsAndNotes.html">R Cheatsheets &amp; Notes</a>
+    </li>
+    <li>
+      <a href="DataSources.html">Data Sources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Describing Data
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="GraphicalSummaries.html">Graphical Summaries</a>
+    </li>
+    <li>
+      <a href="NumericalSummaries.html">Numerical Summaries</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Making Inference
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="MakingInference.html">Making Inference</a>
+    </li>
+    <li>
+      <a href="tTests.html">t Tests</a>
+    </li>
+    <li>
+      <a href="WilcoxonTests.html">Wilcoxon Tests</a>
+    </li>
+    <li>
+      <a href="ANOVA.html">ANOVA</a>
+    </li>
+    <li>
+      <a href="Kruskal.html">Kruskal-Wallis</a>
+    </li>
+    <li>
+      <a href="LinearRegression.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="LogisticRegression.html">Logistic Regression</a>
+    </li>
+    <li>
+      <a href="ChiSquaredTests.html">Chi Squared Tests</a>
+    </li>
+    <li>
+      <a href="PermutationTests.html">Randomization Testing</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="./Analyses/AnalysisRubric.html">Analysis Rubric</a>
+    </li>
+    <li>
+      <a href="./Analyses/StudentHousing.html">Good Example Analysis</a>
+    </li>
+    <li>
+      <a href="./Analyses/StudentHousingPOOR.html">Poor Example Analysis</a>
+    </li>
+    <li>
+      <a href="./Analyses/Rent.html">Rent Analysis</a>
+    </li>
+    <li>
+      <a href="./Analyses/Stephanie.html">Stephanie Analysis</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">R Cheat Sheets &amp; Notes</h1>
+
+</div>
+
+
+<div id="cheat-sheets" class="section level2">
+<h2>Cheat Sheets</h2>
+<ul>
+<li><p><a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">R Colors</a></p></li>
+<li><p><a href="http://www.joyce-robbins.com/wp-content/uploads/2016/04/BaseGraphicsCheatsheet.pdf">R Base Graphics Cheat Sheet</a></p></li>
+<li><p><a href="https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf">R Base Commands Cheat Sheet</a></p></li>
+<li><p><a href="https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf">R Markdown Cheat Sheet</a></p></li>
+<li><p><a href="https://support.rstudio.com/hc/en-us/articles/200711853-Keyboard-Shortcuts">Keyboard Shortcuts</a></p></li>
+</ul>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<p>Add your own notes here…</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># Add R commands you want to remember here...</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># Or create other R chunks to put them in like this...</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># Using ```{r, eval=FALSE} turns off the chunk, but still shows it.</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co"># Useful when you want to remember code, but not run it in this file.</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># Create the data:</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1140411</span>)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">sample1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">30</span>, <span class="dv">69</span>, <span class="fl">2.5</span>)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">sample2 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">30</span>, <span class="dv">69</span>, <span class="fl">2.5</span>)</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">theData &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">values =</span> <span class="kw">c</span>(sample1,sample2), <span class="dt">group =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">each=</span><span class="dv">30</span>))</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="kw">View</span>(theData)</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="kw">boxplot</span>(values <span class="op">~</span><span class="st"> </span>group, <span class="dt">data =</span> theData)</a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"> </a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co"># Run the permutation test:</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13">myTest &lt;-<span class="st">  </span><span class="kw">t.test</span>(values<span class="op">~</span>group, <span class="dt">data=</span>theData, <span class="dt">mu=</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb4-14" data-line-number="14">observedTestStat &lt;-<span class="st"> </span>myTest<span class="op">$</span>statistic</a>
+<a class="sourceLine" id="cb4-15" data-line-number="15">observedTestStat</a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"> </a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18">N &lt;-<span class="st"> </span><span class="dv">2000</span>      </a>
+<a class="sourceLine" id="cb4-19" data-line-number="19">permutedTestStats &lt;-<span class="st">  </span><span class="kw">rep</span>(<span class="ot">NA</span>, N)</a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="cf">for</span>  (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>N ) {</a>
+<a class="sourceLine" id="cb4-21" data-line-number="21">   permutedData &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dt">x=</span>theData<span class="op">$</span>group)</a>
+<a class="sourceLine" id="cb4-22" data-line-number="22">   permutedTest &lt;-<span class="st"> </span><span class="kw">t.test</span>(values<span class="op">~</span>permutedData,<span class="dt">data=</span>theData, <span class="dt">mu=</span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb4-23" data-line-number="23">   permutedTestStats[i]  &lt;-<span class="st">  </span>permutedTest<span class="op">$</span>statistic</a>
+<a class="sourceLine" id="cb4-24" data-line-number="24">}</a>
+<a class="sourceLine" id="cb4-25" data-line-number="25"><span class="kw">hist</span>(permutedTestStats)</a>
+<a class="sourceLine" id="cb4-26" data-line-number="26"><span class="kw">abline</span>(<span class="dt">v=</span>observedTestStat)</a>
+<a class="sourceLine" id="cb4-27" data-line-number="27"><span class="kw">sum</span>(permutedTestStats <span class="op">&gt;=</span><span class="st"> </span>observedTestStat)<span class="op">/</span>N</a>
+<a class="sourceLine" id="cb4-28" data-line-number="28"><span class="kw">sum</span>(permutedTestStats <span class="op">&lt;=</span><span class="st"> </span>observedTestStat)<span class="op">/</span>N</a>
+<a class="sourceLine" id="cb4-29" data-line-number="29"><span class="kw">sum</span>(permutedTestStats <span class="op">&lt;=</span><span class="st"> </span>observedTestStat)<span class="op">*</span><span class="dv">2</span><span class="op">/</span>N</a></code></pre></div>
+<p>set.seed(121) sample1 &lt;- rnorm(30, 185, 8) sample2 &lt;- sample1 - rnorm(30, 0, 3.5) theData &lt;- data.frame(values = c(sample1,sample2), group = rep(c(1,2), each=30), id = rep(c(1:30),times=2)) View(theData) with(theData, hist(values[group==1] - values[group==2]))</p>
+<pre><code>
+
+mean(sample1)-mean(sample2)
+mean(sample2)-mean(sample1)</code></pre>
+</div>
+<div id="create-the-data" class="section level1">
+<h1>Create the data:</h1>
+<p>set.seed(121) sample1 &lt;- rnorm(30, 185, 8) sample2 &lt;- sample1 - rnorm(30, 0, 3.5) theData &lt;- data.frame(values = c(sample1,sample2), group = rep(c(1,2), each=30), id = rep(c(1:30),times=2)) View(theData) with(theData, hist(values[group==1] - values[group==2]))</p>
+</div>
+<div id="perform-the-permutation-test" class="section level1">
+<h1>Perform the permutation test:</h1>
+<p>myTest &lt;- t.test(values~group,data=theData, paried=TRUE,m=0) observedTestStat &lt;- myTest$statistic</p>
+<p>N &lt;- 2000<br />
+permutedTestStats &lt;- rep(NA, N) for (i in 1:N ){ permutedData &lt;- sample(x=c(1,-1), size=30,replace=TRUE)</p>
+<p>permutedTest &lt;- with(theData, t.test(permutedData * values[group==1]-values[group==2],mu=0) permutedTestStats[i] &lt;- permutedTest$statistic }</p>
+<p>hist(permutedTestStats) abline(v=observedTestStat) sum(permutedTestStats &gt;= observedTestStat)/N sum(permutedTestStats &lt;= observedTestStat)/N</p>
+<pre><code>
+
+## ANOVA AND REPLACEMENT EXAMPLE
+
+
+
+  choc$Cocao &lt;- as.numeric(gsub(&quot;%&quot;,&quot;&quot;,choc$Cocao))
+
+Chocaov&lt;-aov(Cocao~BroadOrig, data=choc)
+  par(mfrow=c(1,2))
+plot(Chocaov, which=1:2, pch=16)</code></pre>
+<div id="kruskal-wallace" class="section level2">
+<h2>KRUSKAL WALLACE</h2>
+<p><strong>Make A Table Summary</strong></p>
+<p>Friendly %&gt;% group_by(condition) %&gt;% summarise(min = min(correct), median = median(correct), mean = mean(correct), max = max(correct), sd = sd(correct), <code>Number of Students</code> = n()) %&gt;% pander(caption=“Summary Of Results”)</p>
+<pre><code>
+Normal QQ Plot
+
+
+qqnorm(Friendly$correct)
+qqline(Friendly$correct)</code></pre>
+<p>Strip Chart</p>
+<p>stripchart(Friendly<span class="math inline">\(correct~Friendly\)</span>condition, method=“stack”, xlab=“Number Remembered Accurately of 40”, main=“Which Learning Method is the Best”, ylab=“Learning Method”)</p>
+<pre><code>
+Wilcoxan Test
+
+
+pander(
+wilcox.test( correct ~ condition, data=F5, mu=0, alternative=&quot;two.sided&quot; , confidence=0.95)
+)</code></pre>
+<p>Filtering: for LM and Select</p>
+<p>gp&lt;-filter(OWD, hero==“Genji”) gp1&lt;-filter(gp, stat_name==“Dragonblade Efficiency” | stat_name==“Eliminations” | stat_name==“Dragonblades”)</p>
+<p>gp2&lt;-select(gp1, “stat_amount”, “player”, “stat_name”, “start_time”) %&gt;% group_by(start_time, player) %&gt;% pivot_wider(names_from = stat_name, values_from = stat_amount) %&gt;% rename(Dragonblade_Efficiency=“Dragonblade Efficiency”) %&gt;% mutate(Dragonblade_Efficiency=ifelse(is.na(Dragonblade_Efficiency), 0, Dragonblade_Efficiency)) %&gt;% mutate(Dragonblades=ifelse(is.na(Dragonblades), 0, Dragonblades))</p>
+<pre><code>
+Filtering: Linear Model Genji Example
+
+
+genjilm &lt;- lm(Eliminations ~ Dragonblade_Efficiency, data=gp2)
+par(mfrow=c(1,3))
+plot(genjilm, which=1)
+qqPlot(genjilm$residuals, id=FALSE)
+plot(genjilm$residuals, main=&quot;Residuals vs Order&quot;)</code></pre>
+<p>FB &lt;- lm(Eliminations ~ Dragonblade_Efficiency, data=gp2) pander(summary(FB))</p>
+<pre><code>
+plot(Eliminations ~ Dragonblade_Efficiency, data=gp2, pch=20, col=&quot;firebrick&quot;, cex=1.2, las=1,
+     xlab=&quot;DragonBlade Efficcney&quot;, ylab=&quot;Eliminations&quot;,
+     main=&quot;Eliminaitons Correlated with DragonBlade Efficiency&quot;)
+
+genjilm &lt;- lm(Eliminations ~ Dragonblade_Efficiency, data=gp2)
+abline(genjilm, lwd=2, col=rgb(.689,.133,.133, .3))
+abline(h=seq(0,120,20), v=seq(5,25,5), lty=2, col=rgb(.2,.2,.2,.2))
+
+**LM HomeWise**
+
+ProductDiversityLM&lt;- lm(Total_Royalties ~ Unique_Product_Types, data=PDZ2)
+
+
+
+## GG Plot Sideways Graph
+
+Royalty2P&lt;-Royaltiesbystore %&gt;% ggplot(aes(x=reorder(Store, Total_Royalties_Earned), y=Total_Royalties_Earned), ylab=&quot;Quantity of Product Sold&quot;) + geom_col(fill=&quot;firebrick&quot;, color=&quot;black&quot;) + coord_flip()
+
+Royalty2P + ggtitle(&quot;Stores Reveune&quot;) + ylab(&quot;Total Reveune&quot;) +xlab(&quot;Store&quot;)
+
+**Linear Model Graph**
+
+par(mfrow=c(1,1))
+plot(Total_Royalties ~ Unique_Product_Types,  col= &quot;red&quot; , data=PDZ2, xlab=&quot;Unique Number of Product Types Sold By Store&quot;, ylab=&quot;Total Reveune Generated&quot;)
+b&lt;-ProductDiversityLM$coefficients
+curve(b[1]+b[2]*x, add=TRUE, lwd=2, col=&#39;goldenrod&#39;)
+curve((b[1] + b[3]) + (b[2] + b[4])*x, col=&quot;lightcoral&quot;, lwd=2, add=TRUE)
+
+
+## Chi Squared Test of Independence
+
+
+##Filtering the Data
+
+GS2&lt;-filter(GSS2012, pray %in% c(1,2,3,4,5,6))
+       GS2&lt;-filter(GSS2012, bible %in% c(1,2,3))
+       
+       GS2&lt;-GS2 %&gt;% 
+         mutate( 
+           bible=case_when(
+             GS2$bible==1 ~ &quot;Word Of God&quot;,
+             GS2$bible==2 ~ &quot;Inspired Word&quot;,
+             GS2$bible==3 ~ &quot;Book of Fables&quot;,
+      
+        )
+         )
+           
+           GS2&lt;-GS2 %&gt;%  
+             mutate(
+           pray=case_when(
+             GS2$pray==1 ~ &quot;Several Times A day&quot;,
+             GS2$pray==2 ~ &quot;Once A Day&quot;,
+             GS2$pray==3 ~ &quot;Several times a week&quot;,
+             GS2$pray==4 ~ &quot;Once a Week&quot;,
+             GS2$pray==5 ~ &quot;Less than once a week&quot;,
+             GS2$pray==6 ~ &quot;Never&quot;,
+         ))</code></pre>
+<p>prayert&lt;-table(GS2$pray)</p>
+<p>biblet&lt;-table(GS2$bible)</p>
+<p>praybiblet&lt;-table(GS2<span class="math inline">\(pray, GS2\)</span>bible)</p>
+<p>t2&lt;-table(Pray=GS2<span class="math inline">\(pray,Bible=GS2\)</span>bible)</p>
+<p>pander(chi.t2$expected &gt; 5)</p>
+<p>pander(chi.t2 &lt;- chisq.test(t2))</p>
+<pre><code>
+
+pander(mean(chi.t2$expected))</code></pre>
+</div>
+<div id="logisitic-regression" class="section level2">
+<h2>Logisitic Regression</h2>
+<p>blow.glm &lt;- glm(y&gt;0 ~ D, data=blowAPB, family=binomial) summary(blow.glm) b&lt;-coefficients(blow.glm)</p>
+<p><strong>Plotting</strong></p>
+<p>plot( y&gt;0 ~ D, data=blowAPB, main=&quot;“, ylab=‘Probability of Tree Dying’, xlab=”Tree Diameter in cm)&quot;, pch=16) curve(exp(b[1]-b[2]<em>x)/(1-exp(b[1]-b[2]</em>x)), from=1, to=60, add=TRUE) ```</p>
+<p><strong>Holsten Test (test of normality of logisitc regression</strong></p>
+<p>pander(hoslem.test(blow.glm<span class="math inline">\(y, blow.glm\)</span>fitted, g=6))</p>
+<p>##Kruskal Wallace</p>
+<p>kruskal.test(choc2<span class="math inline">\(Cocao, choc2\)</span>BroadOrig, data=choc2) %&gt;% pander()</p>
+<p>pander(favstats(Cocao ~ BroadOrig, data=choc2)[,-10])</p>
+</div>
+<div id="wilcox-test" class="section level2">
+<h2>Wilcox Test:</h2>
+<p>pander( wilcox.test( correct ~ condition, data=F5, mu=0, alternative=“two.sided” , confidence=0.95) )</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
